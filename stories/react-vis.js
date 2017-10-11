@@ -12,42 +12,12 @@ import {
   XAxis,
   YAxis,
   VerticalBarSeries,
+  AreaSeries,
 } from 'react-vis';
 
-const data = [
-  {x: 0, y: 8},
-  {x: 1, y: 5},
-  {x: 2, y: 4},
-  {x: 3, y: 9},
-  {x: 4, y: 1},
-  {x: 5, y: 7},
-  {x: 6, y: 6},
-  {x: 7, y: 3},
-  {x: 8, y: 2},
-  {x: 9, y: 0}
-];
+import data from './data';
+import RollingData from './RollingData';
 
-class RollingData extends Component {
-  state = {
-    data,
-  }
-
-  componentDidMount() {
-    this.timeout = setInterval(() => {
-      this.setState({
-        data: this.state.data.map(item => ({ x: item.x, y: Math.random() })),
-      });
-    }, 1000)
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timeout);
-  }
-
-  render() {
-    return this.props.children(this.state.data);
-  }
-}
 
 storiesOf('react-vis', module)
 .add('LineSeries - simple', () => (
@@ -131,5 +101,36 @@ storiesOf('react-vis', module)
         <LineSeries data={newData} animation />
       </XYPlot>
     ) }
+  </RollingData>
+))
+.add('Sparklines~ish', () => (
+  <RollingData>
+  { newData => {
+    const smallData = newData.slice(5);
+    return <div>
+      <XYPlot height={50} width={64} margin={{ top: 0, left: 0, bottom: 0, right: 0 }}>
+        <VerticalBarSeries data={smallData} animation />
+      </XYPlot>
+      <XYPlot height={50} width={64} margin={{ top: 0, left: 0, bottom: 0, right: 0 }}>
+        <AreaSeries data={newData} animation fill="#00ccbc" opacity={0.5} />
+        <LineSeries data={newData} animation stroke="#00ccbc" />
+      </XYPlot>
+    </div>
+    } }
+  </RollingData>
+))
+.add('Sparklines~ish - with custom domain scale', () => (
+  <RollingData>
+  { newData => {
+    return <div>
+      <XYPlot height={50} width={64} margin={{ top: 0, left: 0, bottom: 0, right: 0 }} yDomain={[-1, 4]}>
+        <VerticalBarSeries data={newData} animation />
+      </XYPlot>
+      <XYPlot height={50} width={64} margin={{ top: 0, left: 0, bottom: 0, right: 0 }} yDomain={[-1, 4]}>
+        <AreaSeries data={newData} animation fill="#00ccbc" opacity={0.5} />
+        <LineSeries data={newData} animation stroke="#00ccbc" />
+      </XYPlot>
+    </div>
+    } }
   </RollingData>
 ))
